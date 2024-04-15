@@ -1,9 +1,20 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  SerializedPrimaryKey,
+  BeforeCreate,
+} from '@mikro-orm/core';
+import { ObjectId } from '@mikro-orm/mongodb'; // Import ObjectId from MikroORM's MongoDB package
+import * as bcrypt from 'bcryptjs';
 
 @Entity()
 export class User {
   @PrimaryKey()
-  _id!: string;
+  _id: ObjectId = new ObjectId();
+
+  @SerializedPrimaryKey()
+  id!: string; // This is a string representation of the ObjectId
 
   @Property()
   username!: string;
@@ -16,4 +27,13 @@ export class User {
 
   @Property()
   deleted: boolean = false;
+
+  @BeforeCreate()
+  hashPassword() {
+    const saltRounds = 10;
+    const hashedPassword = bcrypt.hash(this.password, saltRounds);
+    console.log(hashedPassword, '<<<hashedPassword');
+
+    this.password = hashedPassword;
+  }
 }
