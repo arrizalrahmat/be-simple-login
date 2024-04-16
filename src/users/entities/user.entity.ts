@@ -32,7 +32,6 @@ export class User {
   hashPassword() {
     const saltRounds = 10;
     const hashedPassword = bcrypt.hash(this.password, saltRounds);
-    console.log(hashedPassword, '<<<hashedPassword');
 
     this.password = hashedPassword;
   }

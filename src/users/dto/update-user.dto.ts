@@ -1,7 +1,11 @@
-import { IsBoolean, IsOptional } from 'class-validator';
+import { IsBoolean, IsDate, IsOptional } from 'class-validator';
 
 export class UpdateUserDto {
   @IsBoolean()
   @IsOptional()
   deleted?: boolean = false;
+
+  @IsDate()
+  @IsOptional()
+  latestLogin?: Date;
 }

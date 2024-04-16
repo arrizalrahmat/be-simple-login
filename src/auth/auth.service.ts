@@ -12,16 +12,25 @@ export class AuthService {
 
   async signIn(dto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.usersService.findOne(dto.username);
+
     if (user?.password !== dto.password) {
       throw new UnauthorizedException();
     }
+
     const payload = {
       sub: user._id,
       username: user.username,
       deleted: user.deleted,
     };
+
+    const access_token = await this.jwtService.signAsync(payload);
+
+    this.usersService.update(user._id.toString(), access_token, {
+      latestLogin: new Date(),
+    });
+
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token,
     };
   }
 }

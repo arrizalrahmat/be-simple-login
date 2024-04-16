@@ -50,7 +50,6 @@ export class UsersService {
     }
 
     const users = await this.userRepository.findAll();
-    console.log(users, '<<<<users');
     return users;
   }
 
@@ -79,10 +78,19 @@ export class UsersService {
     // Proceed with user update logic
     const objectId = new ObjectId(id);
     const user = await this.userRepository.findOne({ _id: objectId });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    user.deleted = dto.deleted;
-    return await this.userRepository.upsert(user);
+
+    if (typeof dto.deleted === 'boolean') {
+      user.deleted = dto.deleted;
+    }
+
+    if (dto.latestLogin) {
+      user.latestLogin = dto.latestLogin;
+    }
+
+    return await this.userRepository.nativeUpdate({ _id: user._id }, user);
   }
 }
